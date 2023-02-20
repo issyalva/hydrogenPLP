@@ -15,16 +15,15 @@ export const handle = {
 };
 
 export async function loader({params, context, request}) {
-  //const {collectionHandle} = params;
-  const {handle} = params;
   // invariant(handle, 'Missing collectionHandle param');
+  const {handle} = params;
+  console.log('handle: ', handle)
 
   const searchParams = new URL(request.url).searchParams;
-  const cursor = searchParams.get('cursor');
+  const knownFilters = ['productVendor', 'productType'];
   const available = 'available';
   const variantOption = 'variantOption';
-  const {sortKey, reverse} = getSortValuesFromParam(searchParams.get('sort'));
-  const knownFilters = ['productVendor', 'productType'];
+  const cursor = searchParams.get('cursor');
   const filters = [];
   const appliedFilters = [];
 
@@ -46,71 +45,64 @@ export async function loader({params, context, request}) {
       filters.push({variantOption: {name, value: val}});
       appliedFilters.push({label: val, urlParam: {key, value}});
     }
-
-    const {collection, collections} = await context.storefront.query(
-      COLLECTION_QUERY,
-      {
-        variables: {
-          handle: handle,
-          pageBy: 6,
-          cursor,
-          filters,
-          sortKey,
-          reverse,
-          country: context.storefront.i18n.country,
-          language: context.storefront.i18n.language,
-        },
-      },
-    );
-  
-    if (!collection) {
-      throw new Response(null, {status: 404});
+  }
+  if (searchParams.has('minPrice') || searchParams.has('maxPrice')) {
+    const price = {};
+    if (searchParams.has('minPrice')) {
+      price.min = Number(searchParams.get('minPrice')) || 0;
+      appliedFilters.push({
+        label: `Min: $${price.min}`,
+        urlParam: {key: 'minPrice', value: searchParams.get('minPrice')},
+      });
     }
-
-    const collectionNodes = flattenConnection(collections);
-
-    return json({
-      collection,
-      appliedFilters,
-      collections: collectionNodes,
-      analytics: {
-        pageType: AnalyticsPageType.collection,
-        handle
-        // collectionHandle,
-        // resourceId: collection.id,
-      },
+    if (searchParams.has('maxPrice')) {
+      price.max = Number(searchParams.get('maxPrice')) || 0;
+      appliedFilters.push({
+        label: `Max: $${price.max}`,
+        urlParam: {key: 'maxPrice', value: searchParams.get('maxPrice')},
+      });
+    }
+    filters.push({
+      price,
     });
   }
 
-  const {collection} = await context.storefront.query(COLLECTION_QUERY, {
-    variables: {
-      handle,
-      cursor,
+  const {collection, collections} = await context.storefront.query(
+    COLLECTION_QUERY,
+    {
+      variables: {
+        handle: handle,
+        pageBy: 6,
+        cursor,
+        filters,
+        country: context.storefront.i18n.country,
+        language: context.storefront.i18n.language,
+      },
     },
-  });
+  );
 
-  // Handle 404s
   if (!collection) {
     throw new Response(null, {status: 404});
   }
 
-  // json is a Remix utility for creating application/json responses
-  // https://remix.run/docs/en/v1/utils/json
+  const collectionNodes = flattenConnection(collections);
+
   return json({
     collection,
+    appliedFilters,
+    collections: collectionNodes,
+    analytics: {
+      pageType: AnalyticsPageType.collection,
+      handle,
+      resourceId: collection.id,
+    },
   });
-}
 
-export const meta = ({data}) => {
-  return {
-    title: data?.collection?.title ?? 'Collection',
-    description: data?.collection?.description,
-  };
-};
+}
 
 export default function Collection() {
   const {collection, collections, appliedFilters} = useLoaderData();
-  console.log('collection: ,', collection);
+  console.log('useLoaderData(): ', useLoaderData())
   return (
     <>
       <header className="grid w-full gap-8 py-8 justify-items-start">
@@ -134,8 +126,10 @@ export default function Collection() {
           collections={collections}
         >
         <ProductGrid
+          key={collection.id}
           collection={collection}
           url={`/collections/${collection.handle}`}
+          data-test="product-grid"
         />
       </SortFilter>
     </>
@@ -143,14 +137,18 @@ export default function Collection() {
 }
 
 const COLLECTION_QUERY = `#graphql
-  query CollectionDetails($handle: String!, $cursor: String, $filters: [ProductFilter!]) {
+  query CollectionDetails(
+    $handle: String!
+    $cursor: String
+    $filters: [ProductFilter!]
+  ) {
     collection(handle: $handle) {
       id
       title
       description
       handle
       products(
-        first: 10
+        first: 6
         after: $cursor
         filters: $filters
       ) {
@@ -190,6 +188,14 @@ const COLLECTION_QUERY = `#graphql
               compareAtPrice {
                 amount
                 currencyCode
+              }
+              selectedOptions {
+                name
+                value
+              }
+              product {
+                handle
+                title
               }
             }
           }

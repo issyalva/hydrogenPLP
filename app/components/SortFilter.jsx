@@ -17,7 +17,7 @@ export function SortFilter({
   children,
   collections = [],
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   return (
     <>
       <div className="flex items-center justify-between w-full">

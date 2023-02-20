@@ -2,7 +2,11 @@ import {useFetcher} from '@remix-run/react';
 import {useEffect, useState} from 'react';
 import ProductCard from './ProductCard';
 
-export default function ProductGrid({collection, url}) {
+export default function ProductGrid({collection, url, ...props}) {
+  const [initialProducts, setInitialProducts] = useState(
+    collection?.products?.nodes || [],
+  );
+
   const [nextPage, setNextPage] = useState(
     collection.products.pageInfo.hasNextPage,
   );
@@ -11,7 +15,14 @@ export default function ProductGrid({collection, url}) {
     collection.products.pageInfo.endCursor,
   );
 
-  const [products, setProducts] = useState(collection.products.nodes || []);
+  //const [products, setProducts] = useState(collection.products.nodes || []);
+  const [products, setProducts] = useState(initialProducts);
+
+  const productProps = collection?.products?.nodes || [];
+  if (initialProducts !== productProps) {
+    setInitialProducts(productProps);
+    setProducts(productProps);
+  }
 
   // For making client-side requests
   // https://remix.run/docs/en/v1/hooks/use-fetcher
