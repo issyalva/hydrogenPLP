@@ -1,6 +1,5 @@
 import {useLoaderData} from '@remix-run/react';
 import {json} from '@shopify/remix-oxygen';
-// import invariant from 'tiny-invariant';
 import {flattenConnection, AnalyticsPageType} from '@shopify/hydrogen';
 import ProductGrid from '../../components/ProductGrid';
 import {SortFilter} from '../../components/SortFilter';
@@ -15,9 +14,8 @@ export const handle = {
 };
 
 export async function loader({params, context, request}) {
-  // invariant(handle, 'Missing collectionHandle param');
-  const {handle} = params;
 
+  const {handle} = params;
   const searchParams = new URL(request.url).searchParams;
   const knownFilters = ['productVendor', 'productType'];
   const available = 'available';
@@ -72,7 +70,7 @@ export async function loader({params, context, request}) {
     {
       variables: {
         handle: handle,
-        pageBy: 12,
+        pageBy: 8,
         cursor,
         filters,
         country: context.storefront.i18n.country,
@@ -102,12 +100,10 @@ export async function loader({params, context, request}) {
 
 export default function Collection() {
   const {collection, collections, appliedFilters} = useLoaderData();
-  console.log('collection.products.filters: ', collection.products.filters);
 
-  const plpDrawerFilters = collection.products.filters.filter(function (currentElement) {
-    return currentElement.id == 'filter.v.price' || currentElement.id == 'filter.p.product_type' || currentElement.id == 'filter.v.option.color'
-  });
-  console.log('new: ', plpDrawerFilters);
+  const plpDrawerFilters = collection.products.filters.filter(currentElement =>
+    currentElement.id == 'filter.v.price' || currentElement.id == 'filter.p.product_type' || currentElement.id == 'filter.v.option.color'
+  );
   
   return (
     <>
@@ -147,6 +143,7 @@ const COLLECTION_QUERY = `#graphql
     $handle: String!
     $cursor: String
     $filters: [ProductFilter!]
+    $pageBy: Int!
   ) {
     collection(handle: $handle) {
       id
@@ -154,7 +151,7 @@ const COLLECTION_QUERY = `#graphql
       description
       handle
       products(
-        first: 12
+        first: $pageBy
         after: $cursor
         filters: $filters
       ) {
@@ -219,37 +216,37 @@ const COLLECTION_QUERY = `#graphql
   }
 `;
 
-function getSortValuesFromParam(sortParam) {
-  switch (sortParam) {
-    case 'price-high-low':
-      return {
-        sortKey: 'PRICE',
-        reverse: true,
-      };
-    case 'price-low-high':
-      return {
-        sortKey: 'PRICE',
-        reverse: false,
-      };
-    case 'best-selling':
-      return {
-        sortKey: 'BEST_SELLING',
-        reverse: false,
-      };
-    case 'newest':
-      return {
-        sortKey: 'CREATED',
-        reverse: true,
-      };
-    case 'featured':
-      return {
-        sortKey: 'MANUAL',
-        reverse: false,
-      };
-    default:
-      return {
-        sortKey: 'RELEVANCE',
-        reverse: false,
-      };
-  }
-}
+// function getSortValuesFromParam(sortParam) {
+//   switch (sortParam) {
+//     case 'price-high-low':
+//       return {
+//         sortKey: 'PRICE',
+//         reverse: true,
+//       };
+//     case 'price-low-high':
+//       return {
+//         sortKey: 'PRICE',
+//         reverse: false,
+//       };
+//     case 'best-selling':
+//       return {
+//         sortKey: 'BEST_SELLING',
+//         reverse: false,
+//       };
+//     case 'newest':
+//       return {
+//         sortKey: 'CREATED',
+//         reverse: true,
+//       };
+//     case 'featured':
+//       return {
+//         sortKey: 'MANUAL',
+//         reverse: false,
+//       };
+//     default:
+//       return {
+//         sortKey: 'RELEVANCE',
+//         reverse: false,
+//       };
+//   }
+// }

@@ -1,6 +1,4 @@
 import {useMemo, useState} from 'react';
-// import {Menu} from '@headlessui/react';
-
 import {IconFilters, IconCaret, IconXMark} from './Icon';
 
 import {
@@ -54,12 +52,9 @@ export function SortFilter({
 export function FiltersDrawer({
   filters = [],
   appliedFilters = [],
-  //collections = [],
 }) {
   const [params] = useSearchParams();
   const location = useLocation();
-
-  //console.log('filters: ', filters);
 
   const filterMarkup = (filter, option) => {
     switch (filter.type) {
@@ -89,21 +84,6 @@ export function FiltersDrawer({
         );
     }
   };
-
-  // const collectionsMarkup = collections.map((collection) => {
-  //   return (
-  //     <li key={collection.handle} className="pb-4">
-  //       <Link
-  //         to={`/collections/${collection.handle}`}
-  //         className="focus:underline hover:underline"
-  //         key={collection.handle}
-  //         prefetch="intent"
-  //       >
-  //         {collection.title}
-  //       </Link>
-  //     </li>
-  //   );
-  // });
 
   return (
     <>
@@ -194,11 +174,6 @@ function getAppliedFilterLink(filter, params, location) {
   }
   return `${location.pathname}?${paramsClone.toString()}`;
 }
-
-// function getSortLink(sort, params, location) {
-//   params.set('sort', sort);
-//   return `${location.pathname}?${params.toString()}`;
-// }
 
 function getFilterLink(filter, rawInput, params, location) {
   const paramsClone = new URLSearchParams(params);
@@ -304,59 +279,4 @@ function filterInputToParams(type, rawInput, params) {
   return params;
 }
 
-// export default function SortMenu() {
-//   const items = [
-//     {label: 'Featured', key: 'featured'},
-//     {
-//       label: 'Price: Low - High',
-//       key: 'price-low-high',
-//     },
-//     {
-//       label: 'Price: High - Low',
-//       key: 'price-high-low',
-//     },
-//     {
-//       label: 'Best Selling',
-//       key: 'best-selling',
-//     },
-//     {
-//       label: 'Newest',
-//       key: 'newest',
-//     },
-//   ];
-//   const [params] = useSearchParams();
-//   const location = useLocation();
-//   const activeItem = items.find((item) => item.key === params.get('sort'));
 
-//   return (
-//     <Menu as="div" className="relative z-40">
-//       <Menu.Button className="flex items-center">
-//         <span className="px-2">
-//           <span className="px-2 font-medium">Sort by:</span>
-//           <span>{(activeItem || items[0]).label}</span>
-//         </span>
-//         <IconCaret />
-//       </Menu.Button>
-
-//       <Menu.Items
-//         as="nav"
-//         className="absolute right-0 flex flex-col p-4 text-right rounded-sm bg-contrast"
-//       >
-//         {items.map((item) => (
-//           <Menu.Item key={item.label}>
-//             {() => (
-//               <Link
-//                 className={`block text-sm pb-2 px-3 ${
-//                   activeItem?.key === item.key ? 'font-bold' : 'font-normal'
-//                 }`}
-//                 to={getSortLink(item.key, params, location)}
-//               >
-//                 {item.label}
-//               </Link>
-//             )}
-//           </Menu.Item>
-//         ))}
-//       </Menu.Items>
-//     </Menu>
-//   );
-// }

@@ -12,10 +12,9 @@ export default function ProductGrid({collection, url, ...props}) {
   );
 
   const [endCursor, setEndCursor] = useState(
-    collection.products.pageInfo.endCursor,
+    collection?.products?.pageInfo?.endCursor,
   );
 
-  //const [products, setProducts] = useState(collection.products.nodes || []);
   const [products, setProducts] = useState(initialProducts);
 
   const productProps = collection?.products?.nodes || [];
@@ -24,13 +23,9 @@ export default function ProductGrid({collection, url, ...props}) {
     setProducts(productProps);
   }
 
-  // For making client-side requests
-  // https://remix.run/docs/en/v1/hooks/use-fetcher
   const fetcher = useFetcher();
 
   function fetchMoreProducts() {
-    // ?index differentiates index routes from their parent layout routes
-    // https://remix.run/docs/en/v1/guides/routing#what-is-the-index-query-param
     fetcher.load(`${url}?index&cursor=${endCursor}`);
   }
 
@@ -42,6 +37,16 @@ export default function ProductGrid({collection, url, ...props}) {
     setNextPage(collection.products.pageInfo.hasNextPage);
     setEndCursor(collection.products.pageInfo.endCursor);
   }, [fetcher.data]);
+
+  const haveProducts = initialProducts.length > 0;
+  console.log('nextPage: ', nextPage)
+  if (!haveProducts) {
+    return (
+      <>
+        <p className="text-center mt-4">No products found</p>
+      </>
+    );
+  }
 
   return (
     <section className="w-full gap-4 md:gap-8 grid">
