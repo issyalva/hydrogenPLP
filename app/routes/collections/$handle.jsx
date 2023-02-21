@@ -70,7 +70,7 @@ export async function loader({params, context, request}) {
     {
       variables: {
         handle: handle,
-        pageBy: 8,
+        pageBy: 12,
         cursor,
         filters,
         country: context.storefront.i18n.country,
@@ -101,8 +101,8 @@ export async function loader({params, context, request}) {
 export default function Collection() {
   const {collection, collections, appliedFilters} = useLoaderData();
 
-  const plpDrawerFilters = collection.products.filters.filter(currentElement =>
-    currentElement.id == 'filter.v.price' || currentElement.id == 'filter.p.product_type' || currentElement.id == 'filter.v.option.color'
+  const plpDrawerFilters = collection.products.filters.filter(plpFilter =>
+    plpFilter.id == 'filter.v.price' || plpFilter.id == 'filter.p.product_type' || plpFilter.id == 'filter.v.option.color'
   );
   
   return (
@@ -216,37 +216,4 @@ const COLLECTION_QUERY = `#graphql
   }
 `;
 
-// function getSortValuesFromParam(sortParam) {
-//   switch (sortParam) {
-//     case 'price-high-low':
-//       return {
-//         sortKey: 'PRICE',
-//         reverse: true,
-//       };
-//     case 'price-low-high':
-//       return {
-//         sortKey: 'PRICE',
-//         reverse: false,
-//       };
-//     case 'best-selling':
-//       return {
-//         sortKey: 'BEST_SELLING',
-//         reverse: false,
-//       };
-//     case 'newest':
-//       return {
-//         sortKey: 'CREATED',
-//         reverse: true,
-//       };
-//     case 'featured':
-//       return {
-//         sortKey: 'MANUAL',
-//         reverse: false,
-//       };
-//     default:
-//       return {
-//         sortKey: 'RELEVANCE',
-//         reverse: false,
-//       };
-//   }
-// }
+

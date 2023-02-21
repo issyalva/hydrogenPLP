@@ -2,7 +2,7 @@ import {useFetcher} from '@remix-run/react';
 import {useEffect, useState} from 'react';
 import ProductCard from './ProductCard';
 
-export default function ProductGrid({collection, url, ...props}) {
+export default function ProductGrid({collection, url}) {
   const [initialProducts, setInitialProducts] = useState(
     collection?.products?.nodes || [],
   );
@@ -39,7 +39,7 @@ export default function ProductGrid({collection, url, ...props}) {
   }, [fetcher.data]);
 
   const haveProducts = initialProducts.length > 0;
-  console.log('nextPage: ', nextPage)
+
   if (!haveProducts) {
     return (
       <>

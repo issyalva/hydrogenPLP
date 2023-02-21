@@ -765,18 +765,22 @@ video {
 .duration-200 {
   transition-duration: 200ms;
 }
+
 .hover\:underline:hover {
   text-decoration-line: underline;
 }
+
 .focus\:underline:focus {
   text-decoration-line: underline;
 }
+
 @media (min-width: 640px) {
 
   .sm\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
 @media (min-width: 768px) {
 
   .md\:max-h-full {
@@ -823,6 +827,7 @@ video {
     padding-right: 2rem;
   }
 }
+
 @media (min-width: 1024px) {
 
   .lg\:grid-cols-4 {
