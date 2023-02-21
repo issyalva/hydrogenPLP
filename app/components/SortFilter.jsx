@@ -1,14 +1,15 @@
 import {useMemo, useState} from 'react';
 // import {Menu} from '@headlessui/react';
 
-// import {Heading, IconFilters, IconCaret, IconXMark, Text} from '~/components';
+import {IconFilters, IconCaret, IconXMark} from './Icon';
+
 import {
   Link,
   useLocation,
   useSearchParams,
   useNavigate,
 } from '@remix-run/react';
-// import {useDebounce} from 'react-use'; 
+import {useDebounce} from 'react-use'; 
 import {Disclosure} from '@headlessui/react';
 
 export function SortFilter({
@@ -27,9 +28,8 @@ export function SortFilter({
             'relative flex items-center justify-center w-8 h-8 focus:ring-primary/5'
           }
         >
-          {/* <IconFilters /> */}
+          <IconFilters /> 
         </button>
-        {/* <SortMenu /> */}
       </div>
       <div className="flex flex-col flex-wrap md:flex-row">
         <div
@@ -54,10 +54,12 @@ export function SortFilter({
 export function FiltersDrawer({
   filters = [],
   appliedFilters = [],
-  collections = [],
+  //collections = [],
 }) {
   const [params] = useSearchParams();
   const location = useLocation();
+
+  //console.log('filters: ', filters);
 
   const filterMarkup = (filter, option) => {
     switch (filter.type) {
@@ -88,20 +90,20 @@ export function FiltersDrawer({
     }
   };
 
-  const collectionsMarkup = collections.map((collection) => {
-    return (
-      <li key={collection.handle} className="pb-4">
-        <Link
-          to={`/collections/${collection.handle}`}
-          className="focus:underline hover:underline"
-          key={collection.handle}
-          prefetch="intent"
-        >
-          {collection.title}
-        </Link>
-      </li>
-    );
-  });
+  // const collectionsMarkup = collections.map((collection) => {
+  //   return (
+  //     <li key={collection.handle} className="pb-4">
+  //       <Link
+  //         to={`/collections/${collection.handle}`}
+  //         className="focus:underline hover:underline"
+  //         key={collection.handle}
+  //         prefetch="intent"
+  //       >
+  //         {collection.title}
+  //       </Link>
+  //     </li>
+  //   );
+  // });
 
   return (
     <>
@@ -112,20 +114,19 @@ export function FiltersDrawer({
           </div>
         ) : null}
 
-        {/* <Heading as="h4" size="lead" className="pb-4">
+        <h4 className="pb-4">
           Filter By
-        </Heading> */}
+        </h4>
         <div className="divide-y">
           {filters.map(
             (filter) =>
-              filter.values.length > 1 && (
+              filter.values.length && (
                 <Disclosure as="div" key={filter.id} className="w-full">
                   {({open}) => (
                     <>
                       <Disclosure.Button className="flex justify-between w-full py-4">
-                        {/* <Text size="lead">{filter.label}</Text> */}
                         <p>{filter.label}</p>
-                        {/* <IconCaret direction={open ? 'up' : 'down'} /> */}
+                        <IconCaret direction={open ? 'up' : 'down'} />
                       </Disclosure.Button>
                       <Disclosure.Panel key={filter.id}>
                         <ul key={filter.id} className="py-2">
@@ -154,9 +155,9 @@ function AppliedFilters({filters = []}) {
   const location = useLocation();
   return (
     <>
-      {/* <Heading as="h4" size="lead" className="pb-4">
+      <h4 className="pb-4">
         Applied filters
-      </Heading> */}
+      </h4>
       <div className="flex flex-wrap gap-2">
         {filters.map((filter) => {
           return (
@@ -167,7 +168,7 @@ function AppliedFilters({filters = []}) {
             >
               <span className="flex-grow">{filter.label}</span>
               <span>
-                {/* <IconXMark /> */}
+                <IconXMark />
               </span>
             </Link>
           );

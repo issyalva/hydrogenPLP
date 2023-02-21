@@ -17,7 +17,6 @@ export const handle = {
 export async function loader({params, context, request}) {
   // invariant(handle, 'Missing collectionHandle param');
   const {handle} = params;
-  console.log('handle: ', handle)
 
   const searchParams = new URL(request.url).searchParams;
   const knownFilters = ['productVendor', 'productType'];
@@ -46,6 +45,7 @@ export async function loader({params, context, request}) {
       appliedFilters.push({label: val, urlParam: {key, value}});
     }
   }
+  
   if (searchParams.has('minPrice') || searchParams.has('maxPrice')) {
     const price = {};
     if (searchParams.has('minPrice')) {
@@ -72,7 +72,7 @@ export async function loader({params, context, request}) {
     {
       variables: {
         handle: handle,
-        pageBy: 6,
+        pageBy: 12,
         cursor,
         filters,
         country: context.storefront.i18n.country,
@@ -102,7 +102,13 @@ export async function loader({params, context, request}) {
 
 export default function Collection() {
   const {collection, collections, appliedFilters} = useLoaderData();
-  console.log('useLoaderData(): ', useLoaderData())
+  console.log('collection.products.filters: ', collection.products.filters);
+
+  const plpDrawerFilters = collection.products.filters.filter(function (currentElement) {
+    return currentElement.id == 'filter.v.price' || currentElement.id == 'filter.p.product_type' || currentElement.id == 'filter.v.option.color'
+  });
+  console.log('new: ', plpDrawerFilters);
+  
   return (
     <>
       <header className="grid w-full gap-8 py-8 justify-items-start">
@@ -121,7 +127,7 @@ export default function Collection() {
         )}
       </header>
       <SortFilter
-          filters={collection.products.filters}
+          filters={plpDrawerFilters}
           appliedFilters={appliedFilters}
           collections={collections}
         >
@@ -148,7 +154,7 @@ const COLLECTION_QUERY = `#graphql
       description
       handle
       products(
-        first: 6
+        first: 12
         after: $cursor
         filters: $filters
       ) {
